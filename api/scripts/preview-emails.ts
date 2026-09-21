@@ -9,18 +9,15 @@
  */
 import * as fs from 'fs'
 import * as path from 'path'
-import * as handlebars from 'handlebars'
 import inlineCss = require('inline-css')
 import {
   buildEmailContent,
   NOTIFICATION_SUBJECTS,
 } from '../src/billing/notification-content'
+import { renderTemplate, TEMPLATE_DIR } from '../src/mail/render-template'
 
-const TEMPLATE_DIR = path.join(__dirname, '..', 'src', 'mail', 'templates')
-const PARTIAL_DIR = path.join(TEMPLATE_DIR, 'partials')
 const OUT_DIR = path.join(__dirname, '..', 'tmp', 'email-preview')
 
-const BRAND = 'textbee.dev'
 const YEAR = new Date().getFullYear()
 
 /** Meta as the billing service actually records it, per notification type. */
@@ -102,17 +99,6 @@ const SAMPLES: Record<string, Record<string, any>> = {
   },
 }
 
-function registerPartials() {
-  if (!fs.existsSync(PARTIAL_DIR)) return
-  for (const file of fs.readdirSync(PARTIAL_DIR).filter((f) => f.endsWith('.hbs'))) {
-    const name = path.basename(file, '.hbs')
-    handlebars.registerPartial(
-      name,
-      fs.readFileSync(path.join(PARTIAL_DIR, file), 'utf8'),
-    )
-  }
-}
-
 /**
  * Cheap structural checks on the rendered output. These are the failures that
  * are invisible when reading the template source: a stray tag that puts the
@@ -156,13 +142,6 @@ function validate(name: string, html: string): string[] {
 }
 
 async function main() {
-  // Matches the adapter, which registers this helper on construction.
-  handlebars.registerHelper('concat', (...args: any[]) => {
-    args.pop()
-    return args.join('')
-  })
-  registerPartials()
-
   fs.mkdirSync(OUT_DIR, { recursive: true })
   const names = fs
     .readdirSync(TEMPLATE_DIR)
@@ -175,19 +154,15 @@ async function main() {
 
   // Every billing notification type gets its own preview, since they share one
   // template but say completely different things.
-  const billingSource = fs.readFileSync(
-    path.join(TEMPLATE_DIR, 'billing-notification.hbs'),
-    'utf8',
-  )
-  const billingTemplate = handlebars.compile(billingSource)
   for (const type of Object.keys(NOTIFICATION_SUBJECTS)) {
     const context = {
-      brandName: BRAND,
-      year: YEAR,
       name: 'Alex',
       ...buildEmailContent(type, BILLING_META[type] ?? {}),
     }
-    const inlined = await inlineCss(billingTemplate(context), { url: ' ' })
+    const inlined = await inlineCss(
+      renderTemplate('billing-notification', context),
+      { url: ' ' },
+    )
     const label = `billing-${type.replace(/_/g, '-')}`
     fs.writeFileSync(path.join(OUT_DIR, `${label}.html`), inlined)
     rendered.push(label)
@@ -195,14 +170,8 @@ async function main() {
   }
 
   for (const name of names) {
-    const source = fs.readFileSync(path.join(TEMPLATE_DIR, `${name}.hbs`), 'utf8')
-    const context = {
-      brandName: BRAND,
-      year: YEAR,
-      currentYear: YEAR,
-      ...(SAMPLES[name] ?? {}),
-    }
-    const html = handlebars.compile(source)(context)
+    const context = { currentYear: YEAR, ...(SAMPLES[name] ?? {}) }
+    const html = renderTemplate(name, context)
     // The adapter inlines CSS before sending, so the preview must too.
     const inlined = await inlineCss(html, { url: ' ' })
     fs.writeFileSync(path.join(OUT_DIR, `${name}.html`), inlined)

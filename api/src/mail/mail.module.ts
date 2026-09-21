@@ -1,11 +1,16 @@
 import { HandlebarsAdapter, MailerModule } from '@nest-modules/mailer'
 import { Module } from '@nestjs/common'
+import { MongooseModule } from '@nestjs/mongoose'
 import { join } from 'path'
 import { mailTransportConfig } from './mail.config'
 import { MailService } from './mail.service'
+import { SentEmail, SentEmailSchema } from './schemas/sent-email.schema'
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      { name: SentEmail.name, schema: SentEmailSchema },
+    ]),
     MailerModule.forRoot({
       transport: mailTransportConfig,
       defaults: {

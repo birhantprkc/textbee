@@ -74,6 +74,10 @@ export class BillingNotificationsProcessor {
         name: firstName(user.name),
       },
       from: undefined,
+    }, {
+      userId: user._id,
+      category: 'billing',
+      meta: { billingNotificationId: payload.notificationId, notificationType: payload.type },
     })
 
     await this.notificationModel.updateOne(

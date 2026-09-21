@@ -308,6 +308,10 @@ export class AuthService {
       subject: 'textbee.dev - Password Reset',
       template: 'password-reset-request',
       context: { name: firstName(user.name), resetLink, otp },
+    }, {
+      userId: user._id,
+      category: 'auth',
+      redactContextKeys: ['otp', 'resetLink'],
     })
 
     return acceptedResponse
@@ -374,7 +378,7 @@ export class AuthService {
       subject: 'textbee.dev - Password Reset',
       template: 'password-reset-success',
       context: { name: firstName(user.name) },
-    })
+    }, { userId: user._id, category: 'auth' })
 
     return { message: 'Password reset successfully' }
   }
@@ -450,6 +454,10 @@ export class AuthService {
         name: firstName(user.name),
         verificationLink,
       },
+    }, {
+      userId: user._id,
+      category: 'auth',
+      redactContextKeys: ['verificationLink'],
     })
 
     return { message: 'Email verification email sent' }
