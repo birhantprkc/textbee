@@ -2,7 +2,12 @@ import { MailService } from './mail.service'
 
 const build = () => {
   const mailerService: any = { sendMail: jest.fn().mockResolvedValue(undefined) }
-  return { service: new MailService(mailerService), mailerService }
+  const sentEmailModel: any = { create: jest.fn().mockResolvedValue({}) }
+  return {
+    service: new MailService(mailerService, sentEmailModel),
+    mailerService,
+    sentEmailModel,
+  }
 }
 
 describe('MailService', () => {
@@ -116,5 +121,151 @@ describe('MailService', () => {
     expect(message).toBe(
       'Failed to send "password-reset-request" email to so***@example.com: smtp down',
     )
+  })
+
+  describe('delivery results', () => {
+    const quiet = (service: MailService) => {
+      jest.spyOn((service as any).logger, 'error').mockImplementation(() => undefined)
+      jest.spyOn((service as any).logger, 'warn').mockImplementation(() => undefined)
+    }
+
+    it('saves a sent result with the provider message id', async () => {
+      const { service, mailerService, sentEmailModel } = build()
+      mailerService.sendMail.mockResolvedValue({
+        messageId: '<local@example.com>',
+        response: '250 Ok 0100018abc-1234-5678-000000',
+      })
+
+      await service.sendEmailFromTemplate(
+        {
+          to: 'Ada <ada@example.com>',
+          cc: 'admin@example.com',
+          subject: 'Password reset',
+          template: 'password-reset-success',
+          context: { name: 'Ada' },
+        },
+        { userId: 'u1', category: 'auth', meta: { a: 1 } },
+      )
+
+      const doc = sentEmailModel.create.mock.calls[0][0]
+      expect(doc).toMatchObject({
+        source: 'api',
+        category: 'auth',
+        type: 'password-reset-success',
+        user: 'u1',
+        to: ['ada@example.com'],
+        cc: ['admin@example.com'],
+        subject: 'Password reset',
+        status: 'sent',
+        providerMessageId: '0100018abc-1234-5678-000000',
+        providerResponse: '250 Ok 0100018abc-1234-5678-000000',
+        meta: { a: 1 },
+      })
+      expect(doc.error).toBeUndefined()
+      expect(doc.sentAt).toBeInstanceOf(Date)
+      expect(doc.html).toContain('Ada')
+    })
+
+    it('saves a failed result and does not throw', async () => {
+      const { service, mailerService, sentEmailModel } = build()
+      quiet(service)
+      mailerService.sendMail.mockRejectedValue(new Error('smtp down'))
+
+      await expect(
+        service.sendEmailFromTemplate(
+          {
+            to: 'ada@example.com',
+            subject: 'Password reset',
+            template: 'password-reset-success',
+            context: { name: 'Ada' },
+          },
+          { category: 'auth' },
+        ),
+      ).resolves.toBeUndefined()
+
+      expect(sentEmailModel.create.mock.calls[0][0]).toMatchObject({
+        status: 'failed',
+        error: 'smtp down',
+      })
+      expect(
+        sentEmailModel.create.mock.calls[0][0].providerMessageId,
+      ).toBeUndefined()
+    })
+
+    it('keeps redacted values out of the saved body but sends them', async () => {
+      const { service, mailerService, sentEmailModel } = build()
+      const otp = '482913'
+      const resetLink = 'https://textbee.dev/reset-password?otp=482913'
+
+      await service.sendEmailFromTemplate(
+        {
+          to: 'ada@example.com',
+          subject: 'Password reset',
+          template: 'password-reset-request',
+          context: { name: 'Ada', otp, resetLink },
+        },
+        { category: 'auth', redactContextKeys: ['otp', 'resetLink'] },
+      )
+
+      expect(mailerService.sendMail.mock.calls[0][0].context).toMatchObject({
+        otp,
+        resetLink,
+      })
+      const { html } = sentEmailModel.create.mock.calls[0][0]
+      expect(html).toContain('[redacted]')
+      expect(html).not.toContain(otp)
+      expect(html).not.toContain('reset-password')
+    })
+
+    it('saves a null body when rendering fails', async () => {
+      const { service, sentEmailModel } = build()
+      quiet(service)
+
+      await service.sendEmailFromTemplate(
+        { to: 'ada@example.com', subject: 'x', template: 'no-such-template' },
+        { category: 'auth' },
+      )
+
+      expect(sentEmailModel.create.mock.calls[0][0]).toMatchObject({
+        status: 'sent',
+        html: null,
+      })
+    })
+
+    it('does not throw when saving the result fails', async () => {
+      const { service, mailerService, sentEmailModel } = build()
+      quiet(service)
+      sentEmailModel.create.mockRejectedValue(new Error('db down'))
+
+      await expect(
+        service.sendEmailFromTemplate(
+          {
+            to: 'ada@example.com',
+            subject: 'Password reset',
+            template: 'password-reset-success',
+            context: { name: 'Ada' },
+          },
+          { category: 'auth' },
+        ),
+      ).resolves.toBeUndefined()
+      expect(mailerService.sendMail).toHaveBeenCalledTimes(1)
+    })
+
+    it('saves results for plain html sends', async () => {
+      const { service, mailerService, sentEmailModel } = build()
+      mailerService.sendMail.mockResolvedValue({ response: '250 Ok abc-1' })
+
+      await service.sendEmail(
+        { to: 'ada@example.com', subject: 'Hi', html: '<p>Hi</p>', from: undefined },
+        { category: 'other', type: 'plain' },
+      )
+
+      expect(sentEmailModel.create.mock.calls[0][0]).toMatchObject({
+        type: 'plain',
+        html: '<p>Hi</p>',
+        status: 'sent',
+        providerMessageId: 'abc-1',
+      })
+    })
   })
 })
