@@ -2386,11 +2386,41 @@ describe('GatewayService', () => {
       appVersionInfo: { versionCode: 20 },
     }
 
+    const originalSwitch = process.env.RECOVERY_POLL_ENABLED
+
     beforeEach(() => {
+      process.env.RECOVERY_POLL_ENABLED = 'true'
       mockDeviceModel.findById.mockResolvedValue(currentDevice)
       mockDeviceModel.findOneAndUpdate.mockReset()
       mockDeviceModel.findOneAndUpdate.mockResolvedValue(currentDevice)
       mockSmsModel.findOneAndUpdate.mockReset()
+    })
+
+    afterEach(() => {
+      if (originalSwitch === undefined) delete process.env.RECOVERY_POLL_ENABLED
+      else process.env.RECOVERY_POLL_ENABLED = originalSwitch
+    })
+
+    it('refuses while recovery is switched off, before taking the cooldown', async () => {
+      process.env.RECOVERY_POLL_ENABLED = 'false'
+
+      await expect(service.claimPendingMessages(deviceId)).rejects.toMatchObject({
+        status: HttpStatus.FORBIDDEN,
+      })
+      expect(mockDeviceModel.findOneAndUpdate).not.toHaveBeenCalled()
+      expect(mockSmsModel.findOneAndUpdate).not.toHaveBeenCalled()
+    })
+
+    it('lets a device override switch recovery on for one device', async () => {
+      process.env.RECOVERY_POLL_ENABLED = 'false'
+      mockDeviceModel.findById.mockResolvedValue({
+        ...currentDevice,
+        configOverrides: { recoveryPollEnabled: true },
+      })
+      mockSmsModel.findOneAndUpdate.mockResolvedValue(null)
+
+      expect(await service.claimPendingMessages(deviceId)).toEqual([])
+      expect(mockDeviceModel.findOneAndUpdate).toHaveBeenCalledTimes(1)
     })
 
     it('falls back to the registered version before the first heartbeat', async () => {

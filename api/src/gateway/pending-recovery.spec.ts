@@ -16,6 +16,10 @@ describe('pending recovery filter', () => {
     expect(filter.device).toEqual(new Types.ObjectId(deviceId))
   })
 
+  it('skips messages queued for a build that does not remember what it sent', () => {
+    expect(filter['metadata.appVersionCode']).toEqual({ $gte: 20 })
+  })
+
   it('keeps messages requested in the last 72 hours', () => {
     expect(filter.requestedAt.$gte).toEqual(new Date('2026-09-17T12:00:00Z'))
   })
