@@ -1,9 +1,11 @@
 import { Types } from 'mongoose'
+import { RECOVERY_MIN_VERSION_CODE } from './device-config'
 import { SMSType } from './sms-type.enum'
 
 // A message the phone may have missed: outbound, still waiting, old enough
 // that its push is not just slow, young enough to still be wanted, and not
-// handed out too many times already.
+// handed out too many times already. It must also have been queued for a
+// build that remembers what it sent, so an older build's send is never repeated.
 export const REDISPATCH_AFTER_MS = 30 * 60 * 1000
 export const RECOVERY_WINDOW_MS = 72 * 60 * 60 * 1000
 export const MAX_DISPATCH_ATTEMPTS = 3
@@ -18,6 +20,7 @@ export function pendingRecoveryFilter(deviceId: string, now: Date = new Date()) 
     type: SMSType.SENT,
     status: { $in: ['pending', 'dispatched', 'unknown'] },
     requestedAt: { $gte: windowStart },
+    'metadata.appVersionCode': { $gte: RECOVERY_MIN_VERSION_CODE },
     $and: [
       {
         $or: [

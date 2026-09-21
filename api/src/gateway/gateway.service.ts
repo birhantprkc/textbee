@@ -1816,6 +1816,13 @@ const updatedSms = await this.smsModel.findByIdAndUpdate(
         HttpStatus.FORBIDDEN,
       )
     }
+    // The app caches the switch until its next heartbeat; turning it off must not wait for that
+    if (!deviceConfigFor(device).recoveryPollEnabled) {
+      throw new HttpException(
+        { success: false, error: 'Message recovery is switched off' },
+        HttpStatus.FORBIDDEN,
+      )
+    }
 
     // One conditional update both checks and takes the cooldown, so two
     // polls arriving together cannot both pass it

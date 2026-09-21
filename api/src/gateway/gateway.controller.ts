@@ -701,7 +701,7 @@ export class GatewayController {
   @ApiResponse(INVALID_DEVICE_ID_RESPONSE)
   @ApiResponse(UNAUTHORIZED_RESPONSE)
   @ApiResponse(DEVICE_NOT_FOUND_RESPONSE)
-  @ApiResponse({ status: 403, description: 'The app version is too old to recover messages.' })
+  @ApiResponse({ status: 403, description: 'The app version is too old to recover messages, or message recovery is switched off.' })
   @ApiResponse({ status: 429, description: 'Polled again within the cooldown.' })
   @UseGuards(AuthGuard, CanModifyDevice)
   @Get('/devices/:id/messages/pending')
