@@ -1035,6 +1035,7 @@ export class WebhookService {
           userId: user._id,
           category: 'webhook',
           meta: { webhookSubscriptionId: subscription._id },
+          redactContextKeys: ['deliveryUrl'],
         })
       } catch (e) {
         console.log(
