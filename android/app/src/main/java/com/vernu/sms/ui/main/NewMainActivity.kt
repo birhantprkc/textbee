@@ -25,6 +25,7 @@ import com.vernu.sms.AppConstants
 import com.vernu.sms.helpers.HeartbeatManager
 import com.vernu.sms.helpers.RecoveryPoll
 import com.vernu.sms.helpers.SharedPreferenceHelper
+import com.vernu.sms.helpers.VersionTracker
 import com.vernu.sms.ui.dashboard.DashboardScreen
 import com.vernu.sms.ui.messages.ComposeScreen
 import com.vernu.sms.ui.messages.MessagesScreen
@@ -45,6 +46,7 @@ class NewMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         RecoveryPoll.runAsync(this, "app_open")
+        if (VersionTracker.hasVersionChanged(this)) VersionTracker.reportVersionToServer(applicationContext)
         setContent {
             TextbeeTheme {
                 val navController = rememberNavController()

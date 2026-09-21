@@ -2514,6 +2514,42 @@ describe('GatewayService', () => {
       expect(update['appStateInfo.lastUpdated']).toBeInstanceOf(Date)
     })
 
+    it('updates the device app version when the reported one differs', async () => {
+      mockDeviceModel.findById.mockResolvedValue({
+        _id: deviceId,
+        appVersionName: '2.8.0',
+        appVersionCode: 0,
+      })
+
+      await service.heartbeat(deviceId, {
+        appVersionName: '2.9.0',
+        appVersionCode: 20,
+      } as any)
+
+      const update = heartbeatUpdate()
+      expect(update.appVersionName).toBe('2.9.0')
+      expect(update.appVersionCode).toBe(20)
+      expect(update['appVersionInfo.versionName']).toBe('2.9.0')
+      expect(update['appVersionInfo.versionCode']).toBe(20)
+    })
+
+    it('leaves the device app version alone when unchanged or unset', async () => {
+      mockDeviceModel.findById.mockResolvedValue({
+        _id: deviceId,
+        appVersionName: '2.9.0',
+        appVersionCode: 20,
+      })
+
+      await service.heartbeat(deviceId, { appVersionName: '2.9.0', appVersionCode: 20 } as any)
+      expect(heartbeatUpdate()).not.toHaveProperty('appVersionName')
+      expect(heartbeatUpdate()).not.toHaveProperty('appVersionCode')
+
+      mockDeviceModel.findByIdAndUpdate.mockClear()
+      await service.heartbeat(deviceId, { appVersionName: '', appVersionCode: 0 } as any)
+      expect(heartbeatUpdate()).not.toHaveProperty('appVersionName')
+      expect(heartbeatUpdate()).not.toHaveProperty('appVersionCode')
+    })
+
     it('clears a token invalidation when the same token is reported again', async () => {
       mockDeviceModel.findById.mockResolvedValue({
         _id: deviceId,
