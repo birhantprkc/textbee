@@ -50,9 +50,9 @@ import { formatDeviceName } from '@/lib/utils'
 import AddDeviceDialog, { type AddDeviceHandle } from './add-device-dialog'
 import {
   DeviceVersionCandidate,
-  getDeviceVersionCode,
+  formatDeviceVersion,
   isDeviceOutdated,
-  latestAppVersionCode,
+  latestAppVersionLabel,
 } from './update-app-helpers'
 
 type DeviceRow = DeviceVersionCandidate & {
@@ -313,7 +313,7 @@ export default function DeviceList() {
                     <div className='flex items-center mt-1 space-x-3 text-xs text-muted-foreground'>
                       <div>
                         App version:{' '}
-                        {getDeviceVersionCode(device as DeviceVersionCandidate) ??
+                        {formatDeviceVersion(device as DeviceVersionCandidate) ??
                           'unknown'}
                       </div>
                       <div>
@@ -325,7 +325,7 @@ export default function DeviceList() {
                         <p className='text-xs text-muted-foreground'>
                           This device is behind the latest supported version{' '}
                           <span className='font-medium text-foreground'>
-                            {latestAppVersionCode}
+                            {latestAppVersionLabel}
                           </span>
                           .
                         </p>

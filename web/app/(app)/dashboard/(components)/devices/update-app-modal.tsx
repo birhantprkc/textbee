@@ -20,7 +20,7 @@ import {
   UPDATE_APP_DONT_ASK_AGAIN_MS,
   UPDATE_APP_REMIND_LATER_MS,
   getOutdatedDevices,
-  latestAppVersionCode,
+  latestAppVersionLabel,
   setUpdatePromptSnooze,
   summarizeOutdatedDeviceNames,
   useUpdatePromptSnooze,
@@ -96,7 +96,7 @@ export default function UpdateAppModal() {
           </DialogTitle>
           <DialogDescription className='text-center text-sm sm:text-base'>
             <span className='font-medium text-foreground'>{deviceSummary}</span>{' '}
-            is ready for an update. Install version {latestAppVersionCode} to get
+            is ready for an update. Install version {latestAppVersionLabel} to get
             improved reliability, bug fixes, and more.
           </DialogDescription>
         </DialogHeader>
