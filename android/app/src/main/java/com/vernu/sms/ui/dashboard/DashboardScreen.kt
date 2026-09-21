@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,12 +20,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +38,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -183,55 +187,13 @@ private fun DeviceStatusCard(
     onToggle: (Boolean) -> Unit,
     onReceiveSmsToggle: (Boolean) -> Unit
 ) {
-    val clipboard = LocalClipboardManager.current
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            run {
-                val hardwareModel = "${Build.BRAND.replaceFirstChar { it.uppercase() }} ${Build.MODEL}"
-                val customName = state.deviceName.trim()
-                val displayName = customName.ifEmpty { hardwareModel }
-                val showModel = customName.isNotEmpty() &&
-                                customName.lowercase() != hardwareModel.lowercase()
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = displayName,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    if (showModel) {
-                        Text(
-                            text = hardwareModel,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    if (state.deviceId.isNotEmpty()) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = state.deviceId,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                            IconButton(
-                                onClick = { clipboard.setText(AnnotatedString(state.deviceId)) }
-                            ) {
-                                Icon(
-                                    Icons.Default.ContentCopy,
-                                    contentDescription = "Copy Device ID",
-                                    modifier = Modifier.size(14.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+        Column(modifier = Modifier.padding(16.dp)) {
+            DeviceIdentityHeader(deviceName = state.deviceName, deviceId = state.deviceId)
 
             Spacer(modifier = Modifier.height(16.dp))
             GatewayStatusStrip(
@@ -269,6 +231,99 @@ private fun DeviceStatusCard(
             if (state.availableSims.isNotEmpty()) {
                 SimCardsSection(sims = state.availableSims)
             }
+        }
+    }
+}
+
+/** Device name, model and id as one compact block anchored by a device icon. */
+@Composable
+private fun DeviceIdentityHeader(deviceName: String, deviceId: String) {
+    val hardwareModel = "${Build.BRAND.replaceFirstChar { it.uppercase() }} ${Build.MODEL}"
+    val customName = deviceName.trim()
+    val displayName = customName.ifEmpty { hardwareModel }
+    val showModel = customName.isNotEmpty() &&
+                    customName.lowercase() != hardwareModel.lowercase()
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Surface(
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier.size(44.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Default.PhoneAndroid,
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = displayName,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (showModel) {
+                Text(
+                    text = hardwareModel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (deviceId.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                DeviceIdChip(deviceId = deviceId)
+            }
+        }
+    }
+}
+
+/** Tap target for the device id. A chip keeps it one line tall, unlike an icon button. */
+@Composable
+private fun DeviceIdChip(deviceId: String) {
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
+    val shape = MaterialTheme.shapes.small
+    val tint = MaterialTheme.colorScheme.onSurfaceVariant
+
+    Surface(
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+        shape = shape,
+        modifier = Modifier
+            .clip(shape)
+            .clickable {
+                clipboard.setText(AnnotatedString(deviceId))
+                Toast.makeText(context, "Device ID copied", Toast.LENGTH_SHORT).show()
+            }
+            .semantics { contentDescription = "Copy device ID" }
+    ) {
+        Row(
+            modifier = Modifier
+                .heightIn(min = 32.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = deviceId,
+                style = MaterialTheme.typography.labelSmall,
+                fontFamily = FontFamily.Monospace,
+                color = tint,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(
+                Icons.Default.ContentCopy,
+                contentDescription = null,
+                modifier = Modifier.size(13.dp),
+                tint = tint
+            )
         }
     }
 }
