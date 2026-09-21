@@ -1936,6 +1936,14 @@ const updatedSms = await this.smsModel.findByIdAndUpdate(
       updateData['appVersionInfo.lastUpdated'] = now
     }
 
+    // Builds from 2.8.0 on report upgrades only here, so keep the device fields current too.
+    if (input.appVersionName && device.appVersionName !== input.appVersionName) {
+      updateData.appVersionName = input.appVersionName
+    }
+    if (input.appVersionCode && device.appVersionCode !== input.appVersionCode) {
+      updateData.appVersionCode = input.appVersionCode
+    }
+
     // Update OS info if provided. These change at most once per OS upgrade,
     // so skip keys already matching the stored value to keep the write a no-op.
     for (const [key, value] of Object.entries(
