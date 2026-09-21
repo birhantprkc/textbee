@@ -11,7 +11,7 @@ import { formatDeviceName } from '@/lib/utils'
 import {
   DeviceVersionCandidate,
   getOutdatedDevices,
-  latestAppVersionCode,
+  latestAppVersionLabel,
   summarizeOutdatedDeviceNames,
 } from './update-app-helpers'
 
@@ -38,7 +38,7 @@ export default function UpdateAppNotificationBar() {
       <AlertDescription className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
         <div className='pr-2 text-sm'>
           <span className='font-medium'>{summary}</span> {verb} running an older app
-          version. Update to version {latestAppVersionCode} for improved
+          version. Update to version {latestAppVersionLabel} for improved
           reliability, bug fixes, and more.
         </div>
         <Button asChild size='sm' className='w-full md:w-auto shrink-0'>
