@@ -68,14 +68,16 @@ export function useSubscription(options?: QueryOpts<Subscription>) {
   })
 }
 
-export function useBillingPlans(options?: ListQueryOpts<Plan>) {
+// /billing/plans returns a bare array, not a { data } envelope. Prices change
+// rarely, so a long stale time avoids refetching on every page.
+export function useBillingPlans(options?: QueryOpts<Plan[]>) {
   return useQuery({
     queryKey: queryKeys.billingPlans,
     queryFn: () =>
       httpBrowserClient
         .get(ApiEndpoints.billing.plans())
-        .then((r) => r.data as ListEnvelope<Plan>),
-    select: selectList<Plan>,
+        .then(unwrapBody<Plan[]>),
+    staleTime: 10 * 60 * 1000,
     ...options,
   })
 }

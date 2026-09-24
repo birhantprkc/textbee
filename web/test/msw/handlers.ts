@@ -65,9 +65,7 @@ export const handlers = [
   http.get(url(ApiEndpoints.billing.currentSubscription()), () =>
     raw(mockSubscription)
   ),
-  http.get(url(ApiEndpoints.billing.plans()), () =>
-    dataEnvelope(mockBillingPlans)
-  ),
+  http.get(url(ApiEndpoints.billing.plans()), () => raw(mockBillingPlans)),
 
   // Account-level message history; device scoping travels as a query param.
   http.get(`${API_BASE_URL}/gateway/messages`, () => raw(mockMessages)),
