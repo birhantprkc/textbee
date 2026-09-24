@@ -13,12 +13,13 @@ import { Spinner } from '@/components/ui/spinner'
 import { Badge } from '@/components/ui/badge'
 import {
   MONEY_BACK_DAYS,
-  findPlanTier,
   formatPlanPrice,
   monthlyEquivalent,
+  priceTiers,
   yearlySavingPercent,
   type BillingInterval,
 } from '@/lib/plans'
+import { useBillingPlans } from '@/lib/api'
 import { Routes } from '@/config/routes'
 import { track } from '@/lib/analytics/track'
 import { cn } from '@/lib/utils'
@@ -79,7 +80,9 @@ export default function CheckoutPage({
 
   // params is a promise in Next 16, reading it synchronously yields undefined
   const { planName } = use(params)
-  const tier = findPlanTier(planName)
+  const { data: plans } = useBillingPlans()
+  const planKey = planName?.trim().toLowerCase()
+  const tier = priceTiers(plans).find((t) => t.id === planKey)
 
   const { status } = useSession()
   const router = useRouter()
@@ -326,7 +329,7 @@ export default function CheckoutPage({
       <fieldset className='mt-6'>
         <legend className='sr-only'>Billing interval</legend>
         <div className='flex flex-col gap-3'>
-          {tier?.yearlyPrice !== undefined && (
+          {tier?.hasYearly && (
             <label
               className={cn(
                 'flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors',
@@ -351,8 +354,9 @@ export default function CheckoutPage({
                   )}
                 </span>
                 <span className='mt-1 block text-sm text-muted-foreground tabular-nums'>
-                  {perMonth !== undefined &&
-                    `${formatPlanPrice(perMonth)}/month, billed yearly at ${formatPlanPrice(tier.yearlyPrice)}`}
+                  {perMonth !== undefined && tier.yearlyPrice !== undefined
+                    ? `${formatPlanPrice(perMonth)}/month, billed yearly at ${formatPlanPrice(tier.yearlyPrice)}`
+                    : 'Billed once a year'}
                 </span>
               </span>
             </label>
@@ -377,7 +381,9 @@ export default function CheckoutPage({
             <span className='flex-1'>
               <span className='font-medium'>Monthly</span>
               <span className='mt-1 block text-sm text-muted-foreground tabular-nums'>
-                {tier && `${formatPlanPrice(tier.monthlyPrice)}/month`}
+                {tier?.monthlyPrice !== undefined
+                  ? `${formatPlanPrice(tier.monthlyPrice)}/month`
+                  : 'Billed every month'}
               </span>
             </span>
           </label>
