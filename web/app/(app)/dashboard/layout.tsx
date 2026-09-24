@@ -47,7 +47,7 @@ export default function DashboardLayout({
       <CommandMenu open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* Desktop sidebar, sits below the sticky app header (h-14). */}
-      <aside className='fixed inset-y-0 left-0 top-14 z-30 hidden w-60 flex-col border-r border-border bg-card md:flex'>
+      <aside className='fixed inset-y-0 left-0 top-14 z-30 hidden w-60 flex-col border-r border-border bg-shell md:flex'>
         <div className='flex-1 overflow-y-auto px-3 py-4'>
           <div className='mb-4'>
             <SearchTrigger onOpen={() => setSearchOpen(true)} />
@@ -85,7 +85,7 @@ export default function DashboardLayout({
         {/* The desktop search trigger lives in the sidebar, which is hidden on
             mobile. A labelled bar beats an icon here: search is how mobile
             reaches Webhooks and every subroute the 4-item tab bar omits. */}
-        <div className='sticky top-14 z-20 border-b border-border bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:hidden'>
+        <div className='sticky top-14 z-20 border-b border-border bg-background/90 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:hidden'>
           <SearchTrigger onOpen={() => setSearchOpen(true)} />
         </div>
 
@@ -110,7 +110,7 @@ export default function DashboardLayout({
       {/* Mobile bottom tab bar (max 4 items; the rest are desktop/palette only). */}
       <nav
         aria-label='Primary (mobile)'
-        className='fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 md:hidden'
+        className='fixed inset-x-0 bottom-0 z-40 border-t border-border bg-shell/95 backdrop-blur supports-[backdrop-filter]:bg-shell/85 md:hidden'
       >
         <div className='flex h-16 items-center justify-around'>
           {mobileNavItems.map((item) => (
@@ -140,7 +140,7 @@ function SidebarLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
       className={cn(
         'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
         isActive
-          ? 'bg-primary/10 text-primary'
+          ? 'bg-card text-primary shadow-[0_0_0_1px_hsl(var(--border))]'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground'
       )}
     >

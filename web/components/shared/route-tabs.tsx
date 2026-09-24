@@ -44,7 +44,7 @@ export default function RouteTabs({
   return (
     <nav
       className={cn(
-        'flex gap-1 overflow-x-auto rounded-lg bg-muted p-1',
+        'flex gap-1 overflow-x-auto rounded-xl border bg-shell p-1',
         'scrollbar-none w-full sm:w-fit',
         className
       )}
@@ -60,9 +60,9 @@ export default function RouteTabs({
             ref={active ? activeRef : undefined}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'shrink-0 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+              'shrink-0 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors',
               active
-                ? 'bg-background text-foreground shadow-sm'
+                ? 'bg-card text-foreground shadow-[0_0_0_1px_hsl(var(--border)),0_1px_2px_rgb(0_0_0/0.08)]'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >

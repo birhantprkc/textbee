@@ -64,7 +64,7 @@ export default function AppHeader({ session }: { session: Session | null }) {
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout} className='text-red-600'>
+        <DropdownMenuItem onClick={handleLogout} className='text-destructive'>
           <LogOut className='mr-2 h-4 w-4' />
           <span>Log out</span>
         </DropdownMenuItem>
@@ -89,7 +89,7 @@ export default function AppHeader({ session }: { session: Session | null }) {
           </Button>
           <Button
             asChild
-            className='rounded-full bg-primary text-white hover:bg-primary/90'
+            className='rounded-full bg-primary text-primary-foreground hover:bg-primary/90'
           >
             <Link href={Routes.register}>Get started</Link>
           </Button>
@@ -99,7 +99,7 @@ export default function AppHeader({ session }: { session: Session | null }) {
   )
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+    <header className='sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80'>
       <div className='flex h-14 items-center gap-2 px-4'>
         <Link className='flex items-center space-x-2' href={Routes.landingPage}>
           <Image
@@ -109,7 +109,7 @@ export default function AppHeader({ session }: { session: Session | null }) {
             height={24}
             className='h-6 w-6 rounded-full bg-white'
           />
-          <span className='font-bold'>
+          <span className='font-semibold tracking-tight'>
             text<span className='text-primary'>bee</span>
             <span className='align-center text-xs text-muted-foreground'>
               .dev
@@ -128,7 +128,7 @@ export default function AppHeader({ session }: { session: Session | null }) {
                 </Button>
                 <Button
                   asChild
-                  className='rounded-full bg-primary text-white hover:bg-primary/90'
+                  className='rounded-full bg-primary text-primary-foreground hover:bg-primary/90'
                 >
                   <Link href={Routes.register}>Get started</Link>
                 </Button>
