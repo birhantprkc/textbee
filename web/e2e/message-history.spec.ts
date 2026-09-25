@@ -430,8 +430,31 @@ test.describe('message history (mocked API, no real backend)', () => {
     await page.goto('/dashboard/messaging/history')
     await page.getByRole('button', { name: 'Filters', exact: true }).click()
     await page.getByLabel('Batch ID').fill('not-a-batch')
-    await expect(page.getByText('A batch ID has 24 letters and digits.')).toBeVisible()
+    await expect(page.getByText('A batch ID has 24 characters: digits 0-9 and letters a-f.')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled()
+  })
+
+  test('a batch that is not on the account gets its own way out', async ({
+    page,
+    context,
+  }) => {
+    await authenticate(context)
+    await mockApi(page)
+    await page.route('**/api/v1/gateway/messages*', (route) =>
+      route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          error: 'Batch not found: 665f1c2a9b1e4a0012ab34cd',
+        }),
+      })
+    )
+
+    await page.goto(
+      '/dashboard/messaging/history?batch=665f1c2a9b1e4a0012ab34cd'
+    )
+    await expect(page.getByText('This batch is not on your account')).toBeVisible()
+    await expect(page.getByText(/^Error:/)).toHaveCount(0)
   })
 
   test('filters survive a refresh through the URL', async ({

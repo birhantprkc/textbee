@@ -248,7 +248,7 @@ export default function FiltersPopover({
                 )}
               >
                 {batchError
-                  ? 'A batch ID has 24 letters and digits.'
+                  ? 'A batch ID has 24 characters: digits 0-9 and letters a-f.'
                   : 'Shows only the messages of one send.'}
               </p>
             </div>

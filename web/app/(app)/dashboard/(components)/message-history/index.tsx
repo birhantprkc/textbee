@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import axios from 'axios'
 import { MessageSquare, SearchX, Smartphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -67,6 +68,12 @@ export default function MessageHistory() {
     order: extraFilters.order,
     smsBatchId: extraFilters.batchId,
   })
+  const isMissingBatch =
+    axios.isAxiosError(messagesError) &&
+    messagesError.response?.status === 404 &&
+    String(messagesError.response.data?.error ?? '').startsWith(
+      'Batch not found:'
+    )
   const isNarrowedBeyondSearch =
     messageType !== 'all' || countExtraFilters(extraFilters) > 0
   const isFiltered = Boolean(search) || isNarrowedBeyondSearch
@@ -178,7 +185,7 @@ export default function MessageHistory() {
 
       {/* The API answers 404 for a batch that is not on this account, which a
           shared link can carry. */}
-      {messagesError && extraFilters.batchId ? (
+      {isMissingBatch ? (
         <div className='rounded-xl border border-border'>
           <EmptyState
             icon={SearchX}
