@@ -67,7 +67,7 @@ export default function SmsDetailsDialog({
                   'flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
                   isSent
                     ? 'bg-primary/10 text-primary'
-                    : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-success/10 text-success'
                 )}
                 aria-hidden
               >

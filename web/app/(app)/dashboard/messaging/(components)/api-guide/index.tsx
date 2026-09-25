@@ -203,10 +203,8 @@ export default function ApiGuide() {
             <div className='flex flex-wrap items-center gap-2'>
               <span
                 className={cn(
-                  'rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold',
-                  endpoint.method === 'POST'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                  'rounded border bg-muted/70 px-1.5 py-0.5 font-mono text-[11px] font-semibold',
+                  endpoint.method === 'POST' ? 'text-success' : 'text-foreground'
                 )}
               >
                 {endpoint.method}

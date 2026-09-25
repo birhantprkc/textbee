@@ -68,7 +68,7 @@ function PlanCard({
           {(highlight || isCurrent) && (
             <Badge
               variant={isCurrent ? 'secondary' : 'default'}
-              className='text-[10px]'
+              className='text-[11px]'
             >
               {isCurrent ? 'Current' : 'Most popular'}
             </Badge>
@@ -102,7 +102,7 @@ function PlanCard({
             </CardDescription>
           )}
           {saving !== undefined && (
-            <Badge variant='secondary' className='mt-2 text-[10px]'>
+            <Badge variant='secondary' className='mt-2 text-[11px]'>
               Save {saving}% yearly
             </Badge>
           )}

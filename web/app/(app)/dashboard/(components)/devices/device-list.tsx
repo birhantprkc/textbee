@@ -154,16 +154,16 @@ export default function DeviceList() {
             <div
               className={`mb-4 flex flex-col gap-2 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between ${
                 isDeviceLimitReached
-                  ? 'border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
-                  : 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40'
+                  ? 'border-destructive/30 bg-destructive/10'
+                  : 'border-warning/30 bg-warning/10'
               }`}
             >
               <div className='flex items-start gap-2'>
                 <TriangleAlert
                   className={`mt-0.5 h-4 w-4 shrink-0 ${
                     isDeviceLimitReached
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-amber-600 dark:text-amber-400'
+                      ? 'text-destructive'
+                      : 'text-warning'
                   }`}
                 />
                 <p className='text-xs text-muted-foreground'>
@@ -254,7 +254,7 @@ export default function DeviceList() {
                         {isDeviceOutdated(device as DeviceVersionCandidate) && (
                           <Badge
                             variant='outline'
-                            className='border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300'
+                            className='border-warning/30 bg-warning/10 text-warning'
                           >
                             Update available
                           </Badge>

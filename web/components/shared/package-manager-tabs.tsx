@@ -102,7 +102,7 @@ export default function PackageManagerTabs({
           className='h-7 w-7'
         >
           {copied ? (
-            <Check className='h-3.5 w-3.5 text-green-600 dark:text-green-400' />
+            <Check className='h-3.5 w-3.5 text-success' />
           ) : (
             <Copy className='h-3.5 w-3.5' />
           )}

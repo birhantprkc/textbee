@@ -85,7 +85,7 @@ function UsageCard({
                   atLimit
                     ? 'bg-destructive'
                     : nearLimit
-                      ? 'bg-amber-500'
+                      ? 'bg-warning'
                       : 'bg-primary'
                 )}
                 style={{ width: `${percentage}%` }}
@@ -99,7 +99,7 @@ function UsageCard({
                   atLimit
                     ? 'font-medium text-destructive'
                     : nearLimit
-                      ? 'font-medium text-amber-600 dark:text-amber-500'
+                      ? 'font-medium text-warning'
                       : 'text-muted-foreground'
                 )}
               >

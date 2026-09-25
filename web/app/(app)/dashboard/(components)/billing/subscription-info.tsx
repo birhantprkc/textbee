@@ -120,14 +120,14 @@ function LimitTile({
   meter,
 }: LimitTileProps) {
   const isUnlimited = effectiveValue === -1
-  const meterColor = meter ? usageMeterColor(meter.percentage) : 'bg-green-500'
+  const meterColor = meter ? usageMeterColor(meter.percentage) : 'bg-success'
 
   return (
     <div
       className={cn(
         'rounded-md border p-2.5',
         isOverridden
-          ? 'border-amber-500/30 bg-amber-500/5'
+          ? 'border-warning/30 bg-warning/10'
           : 'bg-muted/40'
       )}
     >
@@ -137,7 +137,7 @@ function LimitTile({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className='inline-flex cursor-default items-center gap-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400'>
+                <span className='inline-flex cursor-default items-center gap-0.5 rounded-full border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[11px] font-medium text-warning'>
                   <Sparkles className='h-2.5 w-2.5' aria-hidden />
                   Custom
                 </span>
@@ -194,7 +194,7 @@ function LimitTile({
               }}
             />
           </div>
-          <div className='mt-1 flex items-center justify-between gap-2 text-[10px] text-muted-foreground'>
+          <div className='mt-1 flex items-center justify-between gap-2 text-[11px] text-muted-foreground'>
             <span>
               {meter.used.toLocaleString()} {meter.usedLabel}
             </span>
@@ -205,7 +205,7 @@ function LimitTile({
         </div>
       )}
       {meter && meter.unlimited && (
-        <p className='mt-1.5 text-[10px] text-muted-foreground'>
+        <p className='mt-1.5 text-[11px] text-muted-foreground'>
           {meter.used.toLocaleString()} {meter.usedLabel}
         </p>
       )}
@@ -364,7 +364,7 @@ export default function SubscriptionInfo() {
               {hasCustomLimits && (
                 <Badge
                   variant='outline'
-                  className='gap-1 border-amber-500/40 bg-amber-500/10 text-[10px] font-medium text-amber-600 dark:text-amber-400'
+                  className='gap-1 border-warning/30 bg-warning/10 text-[11px] font-medium text-warning'
                 >
                   <Sparkles className='h-3 w-3' aria-hidden />
                   Custom limits
@@ -434,7 +434,7 @@ export default function SubscriptionInfo() {
         )}
 
         {billing.isCanceling && (
-          <p className='mt-3 text-xs text-amber-600 dark:text-amber-400'>
+          <p className='mt-3 text-xs text-warning'>
             Your subscription will not renew. You keep {billing.planName}{' '}
             {currentSubscription?.currentPeriodEnd
               ? `until ${formatDate(currentSubscription.currentPeriodEnd)}`
@@ -512,7 +512,7 @@ export default function SubscriptionInfo() {
             </TooltipProvider>
           </div>
           {hasCustomLimits && (
-            <p className='text-[10px] text-amber-600 dark:text-amber-400'>
+            <p className='text-[11px] text-warning'>
               Custom values set for your account
             </p>
           )}
