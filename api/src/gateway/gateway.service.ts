@@ -1299,7 +1299,7 @@ export class GatewayService {
       )
       .populate({
         path: 'device',
-        select: '_id brand model buildId enabled',
+        select: '_id name brand model buildId enabled',
       })
       .lean() // Use lean() to return plain JavaScript objects instead of Mongoose documents
 
@@ -1374,7 +1374,7 @@ export class GatewayService {
       })
       .populate({
         path: 'device',
-        select: '_id brand model buildId enabled',
+        select: '_id name brand model buildId enabled',
       })
       .lean() // Use lean() to return plain JavaScript objects instead of Mongoose documents
 
@@ -1490,7 +1490,7 @@ export class GatewayService {
 
       const data = await this.smsModel
         .find(findQuery, null, { sort, limit: limit + 1 })
-        .populate({ path: 'device', select: '_id brand model buildId enabled' })
+        .populate({ path: 'device', select: '_id name brand model buildId enabled' })
         .lean()
 
       const hasMore = data.length > limit
@@ -1513,7 +1513,7 @@ export class GatewayService {
     const total = await this.smsModel.countDocuments(query)
     const data = await this.smsModel
       .find(query, null, { sort, limit, skip })
-      .populate({ path: 'device', select: '_id brand model buildId enabled' })
+      .populate({ path: 'device', select: '_id name brand model buildId enabled' })
       .lean()
 
     // nextCursor here too, so a poller can enter keyset mode from its first

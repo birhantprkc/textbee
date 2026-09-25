@@ -15,7 +15,8 @@ import { getStatusBadge } from './utils'
 import { messageDate, messageDirection } from './group'
 import { toExactLabel } from '@/components/shared/relative-time'
 import SmsComposerDialog from './sms-composer-dialog'
-import { cn } from '@/lib/utils'
+import { cn, formatDeviceName } from '@/lib/utils'
+import type { Device } from '@/lib/api'
 import type { SmsMessage } from './types'
 
 type SmsDetailsDialogProps = {
@@ -26,6 +27,8 @@ type SmsDetailsDialogProps = {
   // `device`, but replying must still work if that is ever missing, otherwise
   // the composer opens with no device selected and cannot send.
   fallbackDeviceId?: string
+  // Full device from the account list, preferred over the populated copy.
+  device?: Device
 }
 
 // Ordered by what people open this for: the message itself first, then the
@@ -36,6 +39,7 @@ export default function SmsDetailsDialog({
   open,
   onOpenChange,
   fallbackDeviceId,
+  device,
 }: SmsDetailsDialogProps) {
   const [isReplyOpen, setIsReplyOpen] = useState(false)
   const [isFollowUpOpen, setIsFollowUpOpen] = useState(false)
@@ -47,9 +51,8 @@ export default function SmsDetailsDialog({
     : message.sender || 'Unknown'
   const date = messageDate(message)
   const composerDeviceId = message.device?._id || fallbackDeviceId
-  const deviceName = [message.device?.brand, message.device?.model]
-    .filter(Boolean)
-    .join(' ')
+  const deviceSource = device ?? message.device
+  const deviceName = deviceSource ? formatDeviceName(deviceSource) : ''
 
   return (
     <>
@@ -120,9 +123,13 @@ export default function SmsDetailsDialog({
             </span>
 
             {deviceName && (
-              <span className='inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-muted-foreground'>
-                <Smartphone className='h-3 w-3' />
-                {deviceName}
+              <span
+                className='inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-muted-foreground'
+                title={deviceName}
+              >
+                <Smartphone className='h-3 w-3 shrink-0' />
+                <span className='sr-only'>Device: </span>
+                <span className='truncate'>{deviceName}</span>
               </span>
             )}
 

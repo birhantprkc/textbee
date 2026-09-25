@@ -5,6 +5,7 @@ import { MessageSquare, SearchX, Smartphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDeviceMessages, useDevices } from '@/lib/api'
+import { formatDeviceName } from '@/lib/utils'
 import FiltersBar from './filters-bar'
 import Pagination from '@/components/shared/numbered-pagination'
 import EmptyState from '@/components/shared/empty-state'
@@ -101,6 +102,8 @@ export default function MessageHistory() {
     () => new Map((devices ?? []).map((device) => [device._id, device])),
     [devices]
   )
+  // One device needs no per-row label.
+  const showDeviceOnRows = (devices?.length ?? 0) > 1
 
   // Where a reply must go when a message somehow lacks its device: the first
   // selected device, else the account default, else the first device.
@@ -212,17 +215,27 @@ export default function MessageHistory() {
                 {day.label}
               </h3>
               <div className='divide-y divide-border'>
-                {day.messages.map((message) => (
-                  <MessageRow
-                    key={message._id}
-                    message={message}
-                    device={
-                      devicesById.get(message.device?._id ?? '') ??
-                      devicesById.get(fallbackDeviceId)
-                    }
-                    onSelect={handleSelectMessage}
-                  />
-                ))}
+                {day.messages.map((message) => {
+                  const messageDevice = devicesById.get(
+                    message.device?._id ?? ''
+                  )
+                  const labelDevice = messageDevice ?? message.device
+                  return (
+                    <MessageRow
+                      key={message._id}
+                      message={message}
+                      device={
+                        messageDevice ?? devicesById.get(fallbackDeviceId)
+                      }
+                      deviceLabel={
+                        showDeviceOnRows && labelDevice
+                          ? formatDeviceName(labelDevice)
+                          : undefined
+                      }
+                      onSelect={handleSelectMessage}
+                    />
+                  )
+                })}
               </div>
             </section>
           ))}
@@ -242,6 +255,7 @@ export default function MessageHistory() {
         <SmsDetailsDialog
           message={selectedMessage}
           fallbackDeviceId={fallbackDeviceId}
+          device={devicesById.get(selectedMessage.device?._id ?? '')}
           open={isDetailsDialogOpen}
           onOpenChange={setIsDetailsDialogOpen}
         />

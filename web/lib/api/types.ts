@@ -37,6 +37,8 @@ export interface Device {
   _id: string
   brand?: string
   model?: string
+  // Custom name the user set in the dashboard.
+  name?: string | null
   enabled?: boolean
   // The device the API sends from when a request omits deviceId.
   isDefault?: boolean
@@ -127,7 +129,7 @@ export interface WebhookNotification {
   createdAt?: string
   status: string
   computedStatus?: string
-  deviceData?: { brand?: string; model?: string }
+  deviceData?: { brand?: string; model?: string; name?: string | null }
   smsData?: { _id?: string }
   payload?: unknown
 }
