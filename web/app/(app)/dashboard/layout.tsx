@@ -14,6 +14,7 @@ import { SurveyModal } from '@/components/shared/survey-modal'
 import { JoinCommunityModal } from '@/components/shared/join-community-modal'
 import Footer from '@/components/shared/footer'
 import ThemeToggle from '@/components/shared/theme-toggle'
+import BreadcrumbNav from './(components)/breadcrumb-nav'
 import CommandMenu from './(components)/search/command-menu'
 import SearchTrigger from './(components)/search/search-trigger'
 import {
@@ -89,6 +90,7 @@ export default function DashboardLayout({
           <SearchTrigger onOpen={() => setSearchOpen(true)} />
         </div>
 
+        <BreadcrumbNav />
         <div className='space-y-2 p-4 pb-0'>
           <UpdateAppNotificationBar />
           <VerifyEmailAlert />
