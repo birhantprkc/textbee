@@ -380,6 +380,60 @@ test.describe('message history (mocked API, no real backend)', () => {
     )
   })
 
+  test('the filters popover narrows the request and counts what is applied', async ({
+    page,
+    context,
+  }) => {
+    await authenticate(context)
+    await mockApi(page)
+
+    const requested: string[] = []
+    await page.route('**/api/v1/gateway/messages*', (route) => {
+      requested.push(route.request().url())
+      return route.fallback()
+    })
+
+    await page.goto('/dashboard/messaging/history')
+    await page.getByRole('button', { name: 'Filters', exact: true }).click()
+    await page.getByRole('button', { name: 'Failed' }).click()
+    await page.getByRole('button', { name: 'Oldest first' }).click()
+    await page.getByRole('button', { name: 'Apply' }).click()
+
+    await expect
+      .poll(() =>
+        requested.some(
+          (url) => url.includes('status=failed') && url.includes('order=asc')
+        )
+      )
+      .toBe(true)
+    await expect(
+      page.getByRole('button', { name: 'Filters, 2 applied' })
+    ).toBeVisible()
+    await expect(page).toHaveURL(/status=failed/)
+
+    await page
+      .getByRole('button', { name: 'Remove filter: Status: Failed' })
+      .click()
+    await expect(
+      page.getByRole('button', { name: 'Filters, 1 applied' })
+    ).toBeVisible()
+    await expect(page).not.toHaveURL(/status=/)
+  })
+
+  test('the filters popover holds a bad batch id back', async ({
+    page,
+    context,
+  }) => {
+    await authenticate(context)
+    await mockApi(page)
+
+    await page.goto('/dashboard/messaging/history')
+    await page.getByRole('button', { name: 'Filters', exact: true }).click()
+    await page.getByLabel('Batch ID').fill('not-a-batch')
+    await expect(page.getByText('A batch ID has 24 letters and digits.')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled()
+  })
+
   test('filters survive a refresh through the URL', async ({
     page,
     context,

@@ -9,7 +9,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ArrowDownLeft, ArrowUpRight, MessageSquare, Reply, Smartphone } from 'lucide-react'
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Layers,
+  MessageSquare,
+  Reply,
+  Smartphone,
+} from 'lucide-react'
 import { CopyButton } from '@/components/shared/copy-button'
 import { getStatusBadge } from './utils'
 import { messageDate, messageDirection } from './group'
@@ -29,6 +36,8 @@ type SmsDetailsDialogProps = {
   fallbackDeviceId?: string
   // Full device from the account list, preferred over the populated copy.
   device?: Device
+  // Narrows the history to this message's batch. Omitted, the action is hidden.
+  onShowBatch?: (batchId: string) => void
 }
 
 // Ordered by what people open this for: the message itself first, then the
@@ -40,6 +49,7 @@ export default function SmsDetailsDialog({
   onOpenChange,
   fallbackDeviceId,
   device,
+  onShowBatch,
 }: SmsDetailsDialogProps) {
   const [isReplyOpen, setIsReplyOpen] = useState(false)
   const [isFollowUpOpen, setIsFollowUpOpen] = useState(false)
@@ -166,7 +176,21 @@ export default function SmsDetailsDialog({
             </div>
           )}
 
-          <div className='flex justify-end'>
+          <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+            {message.smsBatch && onShowBatch && (
+              <Button
+                size='sm'
+                variant='outline'
+                className='w-full sm:w-auto'
+                onClick={() => {
+                  onOpenChange(false)
+                  onShowBatch(message.smsBatch as string)
+                }}
+              >
+                <Layers className='h-4 w-4' />
+                Messages in this batch
+              </Button>
+            )}
             {isSent ? (
               <Button
                 size='sm'

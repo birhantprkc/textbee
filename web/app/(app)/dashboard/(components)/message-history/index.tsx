@@ -13,6 +13,7 @@ import SmsDetailsDialog from './sms-details-dialog'
 import { MessageRow, MessageRowSkeleton } from './message-row'
 import { groupMessagesByDay } from './group'
 import { useHistoryFilters } from './use-history-filters'
+import { countExtraFilters, toApiRange } from './extra-filters'
 import type { MessagesPagination, SmsMessage } from './types'
 
 // Container for the message-history screen: owns filter/pagination state and
@@ -30,6 +31,7 @@ export default function MessageHistory() {
   const {
     deviceIds: selectedDeviceIds,
     direction: messageType,
+    extraFilters,
     search,
     page,
     limit,
@@ -38,6 +40,8 @@ export default function MessageHistory() {
     clearSearch,
     handleDeviceSelectionChange,
     handleDirectionChange: handleMessageTypeChange,
+    handleExtraFiltersChange,
+    clearAllFilters,
     handlePageChange,
   } = useHistoryFilters()
 
@@ -57,7 +61,14 @@ export default function MessageHistory() {
     page,
     limit,
     search,
+    status: extraFilters.status,
+    ...toApiRange(extraFilters.from, extraFilters.to),
+    order: extraFilters.order,
+    smsBatchId: extraFilters.batchId,
   })
+  const isNarrowedBeyondSearch =
+    messageType !== 'all' || countExtraFilters(extraFilters) > 0
+  const isFiltered = Boolean(search) || isNarrowedBeyondSearch
 
   const handleRefresh = async () => {
     setIsRefreshing(true)
@@ -154,6 +165,8 @@ export default function MessageHistory() {
         onDeviceSelectionChange={handleDeviceSelectionChange}
         messageType={messageType}
         onMessageTypeChange={handleMessageTypeChange}
+        extraFilters={extraFilters}
+        onExtraFiltersChange={handleExtraFiltersChange}
         search={searchInput}
         onSearchChange={setSearchInput}
         onRefresh={handleRefresh}
@@ -177,17 +190,29 @@ export default function MessageHistory() {
       ) : !messagesError && messages.length === 0 ? (
         // A search that found nothing is a different situation from a device
         // that has never sent a message, and needs a different way out.
-        search ? (
+        isFiltered ? (
           <div className='rounded-xl border border-border'>
             <EmptyState
               icon={SearchX}
-              title={`No messages match "${search}"`}
-              hint='Try a different number or wording.'
+              title={
+                search && !isNarrowedBeyondSearch
+                  ? `No messages match "${search}"`
+                  : 'No messages match these filters'
+              }
+              hint={
+                search && !isNarrowedBeyondSearch
+                  ? 'Try a different number or wording.'
+                  : 'Try a wider date range or fewer filters.'
+              }
             />
             <div className='flex justify-center pb-6'>
               {/* Says what happens rather than repeating the label on the
                   input's clear icon. */}
-              <Button variant='outline' size='sm' onClick={clearSearch}>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={isNarrowedBeyondSearch ? clearAllFilters : clearSearch}
+              >
                 Show all messages
               </Button>
             </div>
@@ -256,6 +281,9 @@ export default function MessageHistory() {
           message={selectedMessage}
           fallbackDeviceId={fallbackDeviceId}
           device={devicesById.get(selectedMessage.device?._id ?? '')}
+          onShowBatch={(batchId) =>
+            handleExtraFiltersChange({ batchId, status: '', from: '', to: '' })
+          }
           open={isDetailsDialogOpen}
           onOpenChange={setIsDetailsDialogOpen}
         />

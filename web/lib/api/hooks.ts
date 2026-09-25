@@ -420,6 +420,12 @@ export type DeviceMessagesParams = {
   page?: number
   limit?: number
   search?: string
+  status?: string
+  // ISO timestamps: from is inclusive, to is exclusive.
+  from?: string
+  to?: string
+  order?: 'desc' | 'asc'
+  smsBatchId?: string
 }
 
 export type DeviceMessagesEnvelope = {
@@ -436,12 +442,32 @@ export function useDeviceMessages(
   params: DeviceMessagesParams = {},
   options?: QueryOpts<DeviceMessagesEnvelope>
 ) {
-  const { type = 'all', page = 1, limit = 20, search = '' } = params
+  const {
+    type = 'all',
+    page = 1,
+    limit = 20,
+    search = '',
+    status = '',
+    from = '',
+    to = '',
+    order = 'desc',
+    smsBatchId = '',
+  } = params
   // Sorted so [a,b] and [b,a] share a cache entry.
   const selection = deviceIds.length ? [...deviceIds].sort().join(',') : 'all'
   return useQuery({
     // search joins the key so each term caches separately.
-    queryKey: queryKeys.deviceMessages(selection, { type, page, limit, search }),
+    queryKey: queryKeys.deviceMessages(selection, {
+      type,
+      page,
+      limit,
+      search,
+      status,
+      from,
+      to,
+      order,
+      smsBatchId,
+    }),
     queryFn: () => {
       const query = new URLSearchParams({
         direction: type,
@@ -450,6 +476,11 @@ export function useDeviceMessages(
       })
       if (selection !== 'all') query.set('deviceIds', selection)
       if (search) query.set('search', search)
+      if (status) query.set('status', status)
+      if (from) query.set('from', from)
+      if (to) query.set('to', to)
+      if (order !== 'desc') query.set('order', order)
+      if (smsBatchId) query.set('smsBatchId', smsBatchId)
 
       return httpBrowserClient
         .get(`${ApiEndpoints.gateway.getMessages()}?${query}`)
