@@ -202,7 +202,7 @@ export default function DeviceList() {
             {isPending && (
               <>
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className='border-0 shadow-none'>
+                  <Card key={i} className='border-0 bg-transparent p-0 shadow-none'>
                     <CardContent className='flex items-center p-3'>
                       <Skeleton className='h-6 w-6 rounded-full mr-3 shrink-0' />
                       <div className='min-w-0 flex-1'>
@@ -242,7 +242,7 @@ export default function DeviceList() {
             )}
 
             {devices?.map((device) => (
-              <Card key={device._id} className='border-0 shadow-none'>
+              <Card key={device._id} className='border-0 bg-transparent p-0 shadow-none'>
                 <CardContent className='flex items-center gap-1 p-3'>
                   <Smartphone className='h-6 w-6 mr-2 shrink-0' />
                   <div className='min-w-0 flex-1'>
@@ -266,7 +266,7 @@ export default function DeviceList() {
                                 <Badge
                                   tabIndex={0}
                                   variant='outline'
-                                  className='cursor-default border-brand-300 bg-brand-50 text-xs text-brand-700 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300'
+                                  className='cursor-default border-primary/30 bg-primary/10 text-xs text-primary'
                                 >
                                   Default
                                 </Badge>
@@ -321,7 +321,7 @@ export default function DeviceList() {
                       </div>
                     </div>
                     {isDeviceOutdated(device as DeviceVersionCandidate) && (
-                      <div className='mt-3 flex items-center justify-between gap-2 rounded-lg border border-brand-100 bg-brand-50/60 px-3 py-2 dark:border-brand-900/50 dark:bg-brand-950/20'>
+                      <div className='mt-3 flex items-center justify-between gap-2 rounded-lg border border-warning/30 bg-warning/[0.08] px-3 py-2'>
                         <p className='text-xs text-muted-foreground'>
                           This device is behind the latest supported version{' '}
                           <span className='font-medium text-foreground'>

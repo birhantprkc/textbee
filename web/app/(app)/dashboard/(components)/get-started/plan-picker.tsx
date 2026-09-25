@@ -129,7 +129,7 @@ function PlanCard({
         </ul>
       </CardContent>
 
-      <CardFooter className='mt-auto flex-col items-stretch gap-2 pb-5 pt-0'>
+      <CardFooter className='mt-auto flex-col items-stretch gap-2 pb-4 pt-3'>
         {isCurrent ? (
           <Button variant='outline' className='w-full' disabled>
             Your current plan

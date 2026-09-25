@@ -41,14 +41,14 @@ function UsageCard({
     <Card>
       <CardContent className='space-y-3 p-5'>
         <div className='flex items-center justify-between'>
-          <p className='text-sm font-medium text-muted-foreground'>{title}</p>
+          <p className='label-mono'>{title}</p>
           <Icon className='h-4 w-4 text-muted-foreground' />
         </div>
 
         {unlimited ? (
           <>
             <div className='flex items-baseline gap-2'>
-              <span className='text-2xl font-bold'>
+              <span className='num text-2xl font-semibold tracking-tight'>
                 {used.toLocaleString()}
               </span>
               <span className='text-sm text-muted-foreground'>
@@ -63,7 +63,7 @@ function UsageCard({
         ) : (
           <>
             <div className='flex items-baseline gap-1.5'>
-              <span className='text-2xl font-bold'>
+              <span className='num text-2xl font-semibold tracking-tight'>
                 {used.toLocaleString()}
               </span>
               <span className='text-sm text-muted-foreground'>
