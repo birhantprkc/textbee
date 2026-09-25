@@ -137,7 +137,7 @@ function LimitTile({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className='inline-flex cursor-default items-center gap-0.5 rounded-full border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[11px] font-medium text-warning'>
+                <span className='inline-flex cursor-default items-center gap-0.5 rounded-full border border-warning/30 px-1.5 py-0.5 text-[11px] font-medium text-warning'>
                   <Sparkles className='h-2.5 w-2.5' aria-hidden />
                   Custom
                 </span>
