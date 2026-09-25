@@ -68,7 +68,7 @@ function PlanCard({
           {(highlight || isCurrent) && (
             <Badge
               variant={isCurrent ? 'secondary' : 'default'}
-              className='text-[10px]'
+              className='text-[11px]'
             >
               {isCurrent ? 'Current' : 'Most popular'}
             </Badge>
@@ -102,7 +102,7 @@ function PlanCard({
             </CardDescription>
           )}
           {saving !== undefined && (
-            <Badge variant='secondary' className='mt-2 text-[10px]'>
+            <Badge variant='secondary' className='mt-2 text-[11px]'>
               Save {saving}% yearly
             </Badge>
           )}
@@ -129,7 +129,7 @@ function PlanCard({
         </ul>
       </CardContent>
 
-      <CardFooter className='mt-auto flex-col items-stretch gap-2 pb-5 pt-0'>
+      <CardFooter className='mt-auto flex-col items-stretch gap-2 pb-4 pt-3'>
         {isCurrent ? (
           <Button variant='outline' className='w-full' disabled>
             Your current plan

@@ -44,7 +44,7 @@ export default function WebhooksHistory() {
 
   return (
     <div className='flex flex-col gap-y-4'>
-      <div className='bg-card rounded-lg shadow-sm border border-border p-4 mb-4'>
+      <div className='frame bg-card rounded-lg border border-border p-4 mb-4'>
         <div className='flex flex-col gap-4'>
           <Filters
             filters={filters}

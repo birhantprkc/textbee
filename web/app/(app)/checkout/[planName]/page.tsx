@@ -60,7 +60,7 @@ function MoneyBackNote({ interval }: { interval: BillingInterval }) {
 function CheckoutShell({ children }: { children: React.ReactNode }) {
   return (
     <div className='flex min-h-[80vh] items-center justify-center p-6'>
-      <div className='w-full max-w-md rounded-lg border border-border bg-card p-8 text-card-foreground shadow-sm'>
+      <div className='frame w-full max-w-md rounded-lg border border-border bg-card p-8 text-card-foreground'>
         {children}
       </div>
     </div>
@@ -236,7 +236,7 @@ export default function CheckoutPage({
         </p>
 
         {planChange.cancelAtPeriodEnd && (
-          <p className='mt-3 text-sm text-amber-600 dark:text-amber-500'>
+          <p className='mt-3 text-sm text-warning'>
             Your subscription is currently scheduled to cancel at the end of the
             billing period. Changing your plan will remove the scheduled
             cancellation.
