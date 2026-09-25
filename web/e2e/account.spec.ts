@@ -219,11 +219,21 @@ test.describe('account settings (mocked API, no real backend)', () => {
     ).toBeInViewport()
     expect(await page.evaluate(() => window.scrollY)).toBe(0)
 
-    const strip = await page
-      .getByRole('navigation', { name: 'Section navigation' })
-      .boundingBox()
-    const box = await tab.boundingBox()
-    expect(box!.x).toBeGreaterThanOrEqual(strip!.x)
-    expect(box!.x + box!.width).toBeLessThanOrEqual(strip!.x + strip!.width + 1)
+    const strip = page.getByRole('navigation', { name: 'Section navigation' })
+    await expect
+      .poll(async () => {
+        const [outer, inner] = await Promise.all([
+          strip.boundingBox(),
+          tab.boundingBox(),
+        ])
+        return Boolean(
+          outer &&
+            inner &&
+            inner.x >= outer.x &&
+            inner.x + inner.width <= outer.x + outer.width + 1
+        )
+      })
+      .toBe(true)
+    expect(await page.evaluate(() => window.scrollY)).toBe(0)
   })
 })
