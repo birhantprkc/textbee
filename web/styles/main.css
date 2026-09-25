@@ -216,6 +216,13 @@
   color: hsl(var(--muted-foreground));
 }
 
+/* Card frame for single-element panels: shell ring plus hairline, no extra markup */
+@utility frame {
+  box-shadow:
+    0 0 0 4px hsl(var(--shell)),
+    0 0 0 5px hsl(var(--border));
+}
+
 /* Figures: mono with tabular digits */
 @utility num {
   font-family: var(--font-mono);

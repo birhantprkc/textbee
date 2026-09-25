@@ -354,11 +354,11 @@ export default function SubscriptionInfo() {
   return (
     <div className='space-y-4'>
       {/* Plan and billing identity. */}
-      <section className='rounded-lg border bg-card p-4 shadow-sm'>
+      <section className='frame rounded-lg border bg-card p-4'>
         <div className='flex flex-wrap items-start justify-between gap-3'>
           <div className='min-w-0'>
             <div className='flex flex-wrap items-center gap-2'>
-              <h3 className='text-lg font-bold text-foreground'>
+              <h3 className='text-lg font-semibold text-foreground'>
                 {billing.planName}
               </h3>
               {hasCustomLimits && (
@@ -487,7 +487,7 @@ export default function SubscriptionInfo() {
       </section>
 
       {/* Usage against the plan's limits. */}
-      <section className='rounded-lg border bg-card p-4 shadow-sm'>
+      <section className='frame rounded-lg border bg-card p-4'>
         <div className='mb-3 flex flex-wrap items-center justify-between gap-2'>
           <div className='flex items-center gap-1'>
             <h4 className='text-xs font-medium text-muted-foreground'>
