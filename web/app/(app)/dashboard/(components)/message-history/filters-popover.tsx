@@ -15,6 +15,7 @@ import {
   DEFAULT_EXTRA_FILTERS,
   countExtraFilters,
   isBatchId,
+  isDay,
   statusesFor,
   type ExtraFilters,
   type Order,
@@ -58,8 +59,11 @@ export default function FiltersPopover({
 
   const batchId = draft.batchId.trim()
   const batchError = batchId && !isBatchId(batchId)
-  const rangeError = draft.from && draft.to && draft.from > draft.to
-  const canApply = !batchError && !rangeError
+  const dateError =
+    (draft.from && !isDay(draft.from)) || (draft.to && !isDay(draft.to))
+  const rangeError =
+    !dateError && draft.from && draft.to && draft.from > draft.to
+  const canApply = !batchError && !dateError && !rangeError
 
   const handleOpenChange = (next: boolean) => {
     if (next) setDraft(value)
@@ -100,6 +104,7 @@ export default function FiltersPopover({
         </Button>
       </PopoverTrigger>
       <PopoverContent
+        aria-labelledby='history-filters-title'
         align='end'
         className='max-h-[var(--radix-popover-content-available-height)] w-[min(20rem,calc(100vw-2rem))] overflow-y-auto p-0'
       >
@@ -110,7 +115,9 @@ export default function FiltersPopover({
           }}
         >
           <div className='flex items-center justify-between border-b px-4 py-3'>
-            <h2 className='text-sm font-semibold'>Filters</h2>
+            <h2 id='history-filters-title' className='text-sm font-semibold'>
+              Filters
+            </h2>
             <Button
               type='button'
               variant='ghost'
@@ -184,6 +191,11 @@ export default function FiltersPopover({
                   />
                 </div>
               </div>
+              {dateError && (
+                <p className='text-xs text-destructive' role='alert'>
+                  Enter a date between 1970 and 9999.
+                </p>
+              )}
               {rangeError && (
                 <p className='text-xs text-destructive' role='alert'>
                   The start date is after the end date.

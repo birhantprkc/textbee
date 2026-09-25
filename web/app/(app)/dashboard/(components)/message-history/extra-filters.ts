@@ -39,6 +39,8 @@ export const isStatus = (value: string) =>
 export function isDay(value: string) {
   if (!DATE_PATTERN.test(value)) return false
   const [year, month, day] = value.split('-').map(Number)
+  // Years outside this range serialize to ISO forms the API rejects.
+  if (year < 1970 || year > 9999) return false
   const date = new Date(year, month - 1, day)
   return date.getMonth() === month - 1 && date.getDate() === day
 }

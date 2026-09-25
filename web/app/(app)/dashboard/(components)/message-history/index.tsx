@@ -42,6 +42,7 @@ export default function MessageHistory() {
     handleDirectionChange: handleMessageTypeChange,
     handleExtraFiltersChange,
     clearAllFilters,
+    showBatch,
     handlePageChange,
   } = useHistoryFilters()
 
@@ -175,10 +176,27 @@ export default function MessageHistory() {
         onAutoRefreshIntervalChange={setAutoRefreshInterval}
       />
 
-      {messagesError && (
-        <div className='flex h-full items-center justify-center'>
-          Error: {messagesError.message}
+      {/* The API answers 404 for a batch that is not on this account, which a
+          shared link can carry. */}
+      {messagesError && extraFilters.batchId ? (
+        <div className='rounded-xl border border-border'>
+          <EmptyState
+            icon={SearchX}
+            title='This batch is not on your account'
+            hint='Check the batch ID, or show all messages.'
+          />
+          <div className='flex justify-center pb-6'>
+            <Button variant='outline' size='sm' onClick={clearAllFilters}>
+              Show all messages
+            </Button>
+          </div>
         </div>
+      ) : (
+        messagesError && (
+          <div className='flex h-full items-center justify-center'>
+            Error: {messagesError.message}
+          </div>
+        )
       )}
 
       {isLoadingMessages ? (
@@ -281,9 +299,7 @@ export default function MessageHistory() {
           message={selectedMessage}
           fallbackDeviceId={fallbackDeviceId}
           device={devicesById.get(selectedMessage.device?._id ?? '')}
-          onShowBatch={(batchId) =>
-            handleExtraFiltersChange({ batchId, status: '', from: '', to: '' })
-          }
+          onShowBatch={showBatch}
           open={isDetailsDialogOpen}
           onOpenChange={setIsDetailsDialogOpen}
         />

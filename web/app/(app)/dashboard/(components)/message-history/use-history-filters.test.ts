@@ -42,6 +42,11 @@ describe('parseHistoryFilters', () => {
     ).toEqual(DEFAULT_FILTERS)
   })
 
+  it('drops a status the direction can never carry', () => {
+    expect(parse('direction=received&status=failed').status).toBe('')
+    expect(parse('direction=sent&status=failed').status).toBe('failed')
+  })
+
   it('swaps a reversed date range', () => {
     expect(parse('from=2026-09-25&to=2026-09-01')).toMatchObject({
       from: '2026-09-01',

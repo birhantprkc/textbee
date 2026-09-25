@@ -44,6 +44,7 @@ export function parseHistoryFilters(params: URLSearchParams): HistoryFilters {
   // A reversed range would match nothing, so read it the way it was meant.
   if (from && to && from > to) [from, to] = [to, from]
   const batchId = (params.get('batch') ?? '').trim()
+  const safeDirection = DIRECTIONS.includes(direction) ? direction : 'all'
 
   return {
     deviceIds: Array.from(
@@ -54,8 +55,13 @@ export function parseHistoryFilters(params: URLSearchParams): HistoryFilters {
           .filter(Boolean)
       )
     ),
-    direction: DIRECTIONS.includes(direction) ? direction : 'all',
-    status: isStatus(status) ? status : '',
+    direction: safeDirection,
+    // A status the direction can never carry would always list nothing.
+    status:
+      isStatus(status) &&
+      statusesFor(safeDirection).some((s) => s.value === status)
+        ? status
+        : '',
     from,
     to,
     order: params.get('order') === 'asc' ? 'asc' : 'desc',
@@ -65,7 +71,8 @@ export function parseHistoryFilters(params: URLSearchParams): HistoryFilters {
   }
 }
 
-// Defaults are omitted, so an unfiltered view stays a bare path.
+// Defaults are omitted, so an unfiltered view stays a bare path. Dates are
+// calendar days, so a shared link follows the viewer's own time zone.
 export function serializeHistoryFilters(filters: HistoryFilters): string {
   const params = new URLSearchParams()
   if (filters.deviceIds.length) params.set('devices', filters.deviceIds.join(','))
@@ -160,6 +167,18 @@ export function useHistoryFilters() {
       setFilters((f) => ({
         ...f,
         ...DEFAULT_EXTRA_FILTERS,
+        direction: 'all',
+        search: '',
+        page: 1,
+      }))
+    },
+    // Every message of one send, so nothing else may narrow it.
+    showBatch: (batchId: string) => {
+      setSearchInput('')
+      setFilters((f) => ({
+        ...f,
+        ...DEFAULT_EXTRA_FILTERS,
+        batchId,
         direction: 'all',
         search: '',
         page: 1,

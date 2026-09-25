@@ -41,6 +41,8 @@ describe('extra filters', () => {
     expect(isDay('2026-09-25')).toBe(true)
     expect(isDay('2026-02-30')).toBe(false)
     expect(isDay('2026-9-5')).toBe(false)
+    expect(isDay('0026-09-25')).toBe(false)
+    expect(isDay('10000-09-25')).toBe(false)
   })
 
   it('labels open and closed ranges', () => {
