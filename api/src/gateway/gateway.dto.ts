@@ -443,6 +443,14 @@ export class MessageDeviceDTO {
   })
   enabled: boolean
 
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Your own label for the device.',
+    example: 'Office phone',
+  })
+  name?: string
+
   @ApiProperty({ type: String, description: 'Device brand.', example: 'google' })
   brand: string
 
