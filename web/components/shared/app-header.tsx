@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, LogOut, LayoutDashboard } from 'lucide-react'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { Routes } from '@/config/routes'
 import { Session } from 'next-auth'
 
@@ -24,8 +24,17 @@ import { Session } from 'next-auth'
 // palette, and the theme control in the sidebar footer.
 // Nullable: the root layout renders this for signed-out visitors too, and the
 // body already guards with session?.user throughout.
-export default function AppHeader({ session }: { session: Session | null }) {
+export default function AppHeader({
+  session: serverSession,
+}: {
+  session: Session | null
+}) {
   const router = useRouter()
+  // The (app) layout that renders this header stays mounted across client
+  // navigation, so the server session prop goes stale after an in-app sign in
+  // or sign out. The client session follows signIn/signOut immediately.
+  const { data: clientSession, status } = useSession()
+  const session = status === 'loading' ? serverSession : clientSession
 
   const handleLogout = () => {
     signOut()
